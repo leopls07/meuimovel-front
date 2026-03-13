@@ -25,10 +25,7 @@
   .vite {
     inset-inline: 0;
     margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
+/* This project uses Tailwind CSS. */
     position: relative;
     z-index: 0;
   }
