@@ -53,12 +53,12 @@ export default function SidebarNav({ variant = 'desktop' }) {
           <div className="leading-tight">
             <div
               className="font-display font-semibold"
-              style={{ color: 'var(--color-sidebar-text)', fontSize: '1.1rem', letterSpacing: '-0.01em' }}
+              style={{ color: 'var(--color-sidebar-text)', fontSize: '1.1rem', letterSpacing: '-0.01em', lineHeight: 1.2 }}
             >
-              Meu Imóvel
+              Sacada<br/>
             </div>
-            <div style={{ color: 'var(--color-sidebar-muted)', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Gestão
+            <div style={{ color: 'var(--color-sidebar-muted)', fontSize: '0.80rem', letterSpacing: '0.04em', lineHeight: 1.3, marginTop: 1 }}>
+              Simulador de financiamento imobiliário
             </div>
           </div>
         </div>
