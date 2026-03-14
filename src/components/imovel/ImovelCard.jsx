@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatBRL, formatM2 } from '@/utils/formatters'
-import { Car, Ruler, BedDouble, Trash2, Eye } from 'lucide-react'
+import { Car, Ruler, BedDouble, Trash2, Eye, PawPrint, ExternalLink } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -118,7 +118,29 @@ export default function ImovelCard({ imovel, onRemove }) {
           <StatPill icon={BedDouble} value={`${imovel?.quartos ?? '—'} qts`} />
           <StatPill icon={Car} value={`${imovel?.vagas ?? '—'} vag`} />
           <StatPill icon={Ruler} value={formatM2(metragem)} />
+          {imovel?.aceitaPets && (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
+              style={{ backgroundColor: 'rgba(107,143,110,0.12)', color: 'var(--color-accent-2)', fontSize: '0.7rem', fontWeight: 500 }}
+            >
+              <PawPrint style={{ width: 12, height: 12 }} /> Pets
+            </span>
+          )}
         </div>
+
+        {imovel?.url && (
+          <a
+            href={imovel.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-medium"
+            style={{ color: 'var(--color-accent)', textDecoration: 'none' }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            <ExternalLink style={{ width: 11, height: 11 }} /> Ver anúncio
+          </a>
+        )}
 
         {/* Custo fixo */}
         {custoFixo > 0 && (

@@ -84,7 +84,7 @@ function CheckboxField({ label, checked, onChange }) {
 }
 
 export default function FiltrosBusca({ onSearch, onClear, disabled }) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [form, setForm] = useState({
     localizacao: '',
     precoMin: '',
@@ -95,6 +95,7 @@ export default function FiltrosBusca({ onSearch, onClear, disabled }) {
     vagas: '',
     areaLazer: false,
     vagaCoberta: false,
+    aceitaPets: false,
     distMaxMetro: '',
     notaMinLoc: '',
   })
@@ -110,6 +111,7 @@ export default function FiltrosBusca({ onSearch, onClear, disabled }) {
       vagas: toNumberOrNull(form.vagas),
       areaLazer: form.areaLazer ? true : null,
       vagaCoberta: form.vagaCoberta ? true : null,
+      aceitaPets: form.aceitaPets ? true : null,
       distMaxMetro: toNumberOrNull(form.distMaxMetro),
       notaMinLoc: toNumberOrNull(form.notaMinLoc),
     }
@@ -127,7 +129,7 @@ export default function FiltrosBusca({ onSearch, onClear, disabled }) {
   }
 
   function handleClear() {
-    setForm({ localizacao: '', precoMin: '', precoMax: '', metMin: '', quartos: '', vagas: '', areaLazer: false, vagaCoberta: false, distMaxMetro: '', notaMinLoc: '' })
+    setForm({ localizacao: '', precoMin: '', precoMax: '', metMin: '', quartos: '', vagas: '', areaLazer: false, vagaCoberta: false, aceitaPets: false, distMaxMetro: '', notaMinLoc: '' })
     onClear?.()
   }
 
@@ -214,6 +216,7 @@ export default function FiltrosBusca({ onSearch, onClear, disabled }) {
             <div className="flex items-end gap-5 md:col-span-2 pb-1">
               <CheckboxField label="Área de lazer" checked={form.areaLazer} onChange={handleChange('areaLazer')} />
               <CheckboxField label="Vaga coberta" checked={form.vagaCoberta} onChange={handleChange('vagaCoberta')} />
+              <CheckboxField label="Aceita pets" checked={form.aceitaPets} onChange={handleChange('aceitaPets')} />
             </div>
           </div>
 

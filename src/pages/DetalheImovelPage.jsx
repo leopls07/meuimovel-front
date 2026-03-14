@@ -37,6 +37,8 @@ const LABELS = {
   estadoConservacao: 'Estado de conservação',
   aliquotaIptu: 'Alíquota IPTU (%)',
   observacoes: 'Observações',
+  url: 'URL do anúncio',
+  aceitaPets: 'Aceita pets',
 }
 
 function kv(obj) {

@@ -28,12 +28,13 @@ function buildInitial(mode, initialData) {
     andar: '', anoConstrucao: '', areaLazer: false, vagaCoberta: false, varanda: false,
     preco: '', condominioMensal: '', iptuMensal: '', aliquotaIptu: '',
     distanciaMetroKm: '', notaLocalizacao: '', estadoConservacao: '', observacoes: '',
+    url: '', aceitaPets: false,
   }
   if (!initialData) return base
   const merged = { ...base, ...initialData }
   if (mode === 'patch') {
     Object.keys(base).forEach((k) => { merged[k] = '' })
-    ;['areaLazer', 'vagaCoberta', 'varanda'].forEach((k) => { merged[k] = false })
+    ;['areaLazer', 'vagaCoberta', 'varanda', 'aceitaPets'].forEach((k) => { merged[k] = false })
   }
   return merged
 }
@@ -159,6 +160,8 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
       notaLocalizacao: numberOrNull(form.notaLocalizacao),
       estadoConservacao: numberOrNull(form.estadoConservacao),
       observacoes: form.observacoes || undefined,
+      url: form.url || undefined,
+      aceitaPets: form.aceitaPets || undefined,
     }
     if (mode === 'patch') {
       Object.keys(payload).forEach((k) => { if (payload[k] == null || payload[k] === '' || payload[k] === false) delete payload[k] })
@@ -245,6 +248,12 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
           <Field label="Observações" error={errors.observacoes} className="sm:col-span-2">
             <CozyInput value={form.observacoes} onChange={setField('observacoes')} placeholder="Detalhes adicionais" />
           </Field>
+          <Field label="URL do anúncio" error={errors.url} className="sm:col-span-2">
+            <CozyInput type="url" value={form.url} onChange={setField('url')} placeholder="https://..." />
+          </Field>
+        </div>
+        <div className="pt-1">
+          <CheckboxField label="Aceita pets" checked={form.aceitaPets} onChange={setField('aceitaPets')} />
         </div>
       </section>
 
