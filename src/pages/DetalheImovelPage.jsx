@@ -287,11 +287,11 @@ export default function DetalheImovelPage() {
                   <Plus className="h-3.5 w-3.5" /> Criar simulação
                 </CozyButton>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)', borderLeft: '1px solid var(--color-border)' }}>
                 <SheetHeader>
                   <SheetTitle className="font-display" style={{ fontSize: '1.4rem', color: 'var(--color-text)' }}>Criar simulação</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4">
+                <div className="p-6">
                   <SimulacaoForm onCancel={() => {}} onSubmit={async (payload) => { await simulacao.create(payload) }} />
                 </div>
               </SheetContent>
