@@ -152,7 +152,7 @@ export default function SimulacaoCard({ simulacao, onPatch, onRemove }) {
         <div className="flex-1" />
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-1" style={{ borderTop: '1px solid var(--color-border)' }}>
+         <div className="flex items-center gap-2 pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
 
           {/* Sheet editar */}
           <Sheet open={editOpen} onOpenChange={setEditOpen}>

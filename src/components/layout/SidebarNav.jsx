@@ -43,19 +43,18 @@ export default function SidebarNav({ variant = 'desktop' }) {
       <div className="px-5 py-6">
         <div className="flex items-center gap-3">
           <div
-            className="flex h-9 w-9 items-center justify-center rounded-xl shrink-0"
-            style={{ backgroundColor: 'var(--color-accent)', color: '#fff' }}
+            className="flex h-12 w-12 items-center justify-center rounded-xl shrink-0"
+            style={{ backgroundColor: 'var(--color-surface-2)', color: '#fff' }}
           >
-            <Home className="h-4 w-4" />
+            <img src="src/assets/favicon.png" alt="Logo" className="h-10 w-10" />
           </div>
           <div className="leading-tight">
             <div
               className="font-display font-semibold"
-              style={{ color: 'var(--color-sidebar-text)', fontSize: '1.1rem', letterSpacing: '-0.01em', lineHeight: 1.2 }}
-            >
-              Sacada<br/>
+              style={{ color: 'var(--color-sidebar-text)', fontSize: '1.0rem', letterSpacing: '-0.01em', lineHeight: 1.2 }}
+            > Sacada<br/>
             </div>
-            <div style={{ color: 'var(--color-sidebar-muted)', fontSize: '0.80rem', letterSpacing: '0.04em', lineHeight: 1.3, marginTop: 1 }}>
+            <div style={{ color: 'var(--color-sidebar-muted)', fontSize: '0.75rem', letterSpacing: '0.04em', lineHeight: 1.3, marginTop: 1 }}>
               Simulador de financiamento imobiliário
             </div>
           </div>
