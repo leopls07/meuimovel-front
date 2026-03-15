@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import CozyMoneyInput from '@/components/ui/cozymoneyinput'
+import CozyMoneyInput from '@/components/ui/CozyMoneyInput'
 
 function Spinner() {
   return (
