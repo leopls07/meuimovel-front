@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { Edit3, Trash2, Plus, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -102,6 +102,20 @@ export default function DetalheImovelPage() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(null)
 
+  const { hash } = useLocation()
+
+  useEffect(() => {
+    if (loading || !hash) return
+    const el = document.querySelector(hash)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [hash, loading])
+
+  const [editImovelOpen, setEditImovelOpen] = useState(false)
+  const [deleteImovelOpen, setDeleteImovelOpen] = useState(false)
+  const [criarSimulacaoOpen, setCriarSimulacaoOpen] = useState(false)
+  const [editSimulacaoOpen, setEditSimulacaoOpen] = useState(false)
+  const [deleteSimulacaoOpen, setDeleteSimulacaoOpen] = useState(false)
+
   useEffect(() => {
     let ignore = false
     async function run() {
@@ -185,31 +199,34 @@ export default function DetalheImovelPage() {
         </div>
 
         <div className="flex gap-2">
-          <Sheet>
+          {/* Sheet editar imóvel */}
+          <Sheet open={editImovelOpen} onOpenChange={setEditImovelOpen}>
             <SheetTrigger asChild>
-              <CozyButton>
+              <CozyButton onClick={() => setEditImovelOpen(true)}>
                 <Edit3 className="h-3.5 w-3.5" /> Editar
               </CozyButton>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)',borderLeft: '1px solid var(--color-border)' }}>
+            <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)', borderLeft: '1px solid var(--color-border)' }}>
               <SheetHeader>
                 <SheetTitle className="font-display" style={{ fontSize: '1.4rem', color: 'var(--color-text)' }}>Editar imóvel</SheetTitle>
               </SheetHeader>
               <div className="p-6">
                 <ImovelPatchForm
-                  onCancel={() => {}}
+                  initialData={data}
+                  onCancel={() => setEditImovelOpen(false)}
                   onSubmit={async (payload, applyValidationErrors) => {
                     const updated = await patch(id, payload, { onValidationErrors: applyValidationErrors })
-                    if (updated) setData(updated)
+                    if (updated) { setData(updated); setEditImovelOpen(false) }
                   }}
                 />
               </div>
             </SheetContent>
           </Sheet>
 
-          <Dialog>
+          {/* Dialog remover imóvel */}
+          <Dialog open={deleteImovelOpen} onOpenChange={setDeleteImovelOpen}>
             <DialogTrigger asChild>
-              <CozyButton variant="danger">
+              <CozyButton variant="danger" onClick={() => setDeleteImovelOpen(true)}>
                 <Trash2 className="h-3.5 w-3.5" /> Remover
               </CozyButton>
             </DialogTrigger>
@@ -219,8 +236,11 @@ export default function DetalheImovelPage() {
                 <DialogDescription style={{ color: 'var(--color-muted)' }}>Essa ação não pode ser desfeita.</DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <CozyButton variant="outline">Cancelar</CozyButton>
-                <CozyButton variant="danger" onClick={async () => { const ok = await remove(id); if (ok) navigate('/imoveis') }}>
+                <CozyButton variant="outline" onClick={() => setDeleteImovelOpen(false)}>Cancelar</CozyButton>
+                <CozyButton variant="danger" onClick={async () => {
+                  const ok = await remove(id)
+                  if (ok) navigate('/imoveis')
+                }}>
                   Confirmar remoção
                 </CozyButton>
               </DialogFooter>
@@ -267,7 +287,7 @@ export default function DetalheImovelPage() {
       </div>
 
       {/* Simulation */}
-      <div className="animate-fade-up-3">
+      <div className="animate-fade-up-3" id="simulacao">
         <div
           className="font-display font-semibold mb-4"
           style={{ fontSize: '1.3rem', color: 'var(--color-text)' }}
@@ -283,9 +303,11 @@ export default function DetalheImovelPage() {
             <div style={{ color: 'var(--color-muted)', fontSize: '0.875rem', marginBottom: 16 }}>
               Nenhuma simulação cadastrada.
             </div>
-            <Sheet>
+
+            {/* Sheet criar simulação */}
+            <Sheet open={criarSimulacaoOpen} onOpenChange={setCriarSimulacaoOpen}>
               <SheetTrigger asChild>
-                <CozyButton>
+                <CozyButton onClick={() => setCriarSimulacaoOpen(true)}>
                   <Plus className="h-3.5 w-3.5" /> Criar simulação
                 </CozyButton>
               </SheetTrigger>
@@ -294,7 +316,13 @@ export default function DetalheImovelPage() {
                   <SheetTitle className="font-display" style={{ fontSize: '1.4rem', color: 'var(--color-text)' }}>Criar simulação</SheetTitle>
                 </SheetHeader>
                 <div className="p-6">
-                  <SimulacaoForm onCancel={() => {}} onSubmit={async (payload) => { await simulacao.create(payload) }} />
+                  <SimulacaoForm
+                    onCancel={() => setCriarSimulacaoOpen(false)}
+                    onSubmit={async (payload) => {
+                      await simulacao.create(payload)
+                      setCriarSimulacaoOpen(false)
+                    }}
+                  />
                 </div>
               </SheetContent>
             </Sheet>
@@ -302,25 +330,36 @@ export default function DetalheImovelPage() {
         ) : (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <Sheet>
+
+              {/* Sheet editar simulação */}
+              <Sheet open={editSimulacaoOpen} onOpenChange={setEditSimulacaoOpen}>
                 <SheetTrigger asChild>
-                  <CozyButton>
+                  <CozyButton onClick={() => setEditSimulacaoOpen(true)}>
                     <Edit3 className="h-3.5 w-3.5" /> Editar simulação
                   </CozyButton>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)', borderLeft: '1px solid var(--color-border)'}}>
+                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto" style={{ backgroundColor: 'var(--color-surface)', borderLeft: '1px solid var(--color-border)' }}>
                   <SheetHeader>
                     <SheetTitle className="font-display" style={{ fontSize: '1.4rem', color: 'var(--color-text)' }}>Editar simulação</SheetTitle>
                   </SheetHeader>
                   <div className="p-6">
-                    <SimulacaoForm initialData={simulacao.data} submitLabel="Salvar" onCancel={() => {}} onSubmit={async (payload) => { await simulacao.patch(payload) }} />
+                    <SimulacaoForm
+                      initialData={simulacao.data}
+                      submitLabel="Salvar"
+                      onCancel={() => setEditSimulacaoOpen(false)}
+                      onSubmit={async (payload) => {
+                        await simulacao.patch(payload)
+                        setEditSimulacaoOpen(false)
+                      }}
+                    />
                   </div>
                 </SheetContent>
               </Sheet>
 
-              <Dialog>
+              {/* Dialog remover simulação */}
+              <Dialog open={deleteSimulacaoOpen} onOpenChange={setDeleteSimulacaoOpen}>
                 <DialogTrigger asChild>
-                  <CozyButton variant="danger">
+                  <CozyButton variant="danger" onClick={() => setDeleteSimulacaoOpen(true)}>
                     <Trash2 className="h-3.5 w-3.5" /> Remover simulação
                   </CozyButton>
                 </DialogTrigger>
@@ -330,11 +369,17 @@ export default function DetalheImovelPage() {
                     <DialogDescription style={{ color: 'var(--color-muted)' }}>Essa ação não pode ser desfeita.</DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
-                    <CozyButton variant="outline">Cancelar</CozyButton>
-                    <CozyButton variant="danger" onClick={async () => { await simulacao.remove() }}>Confirmar remoção</CozyButton>
+                    <CozyButton variant="outline" onClick={() => setDeleteSimulacaoOpen(false)}>Cancelar</CozyButton>
+                    <CozyButton variant="danger" onClick={async () => {
+                      await simulacao.remove()
+                      setDeleteSimulacaoOpen(false)
+                    }}>
+                      Confirmar remoção
+                    </CozyButton>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+
             </div>
             <SimulacaoResultado simulacao={simulacao.data} />
           </div>

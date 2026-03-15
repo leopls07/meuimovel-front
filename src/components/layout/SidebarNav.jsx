@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Building2, Home, Plus } from 'lucide-react'
+import { Building2, Home, Plus, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 function Item({ to, icon: Icon, children, end }) {
@@ -10,9 +10,7 @@ function Item({ to, icon: Icon, children, end }) {
       className={({ isActive }) =>
         cn(
           'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
-          isActive
-            ? 'text-white'
-            : 'hover:opacity-100'
+          isActive ? 'text-white' : 'hover:opacity-100'
         )
       }
       style={({ isActive }) => ({
@@ -78,6 +76,9 @@ export default function SidebarNav({ variant = 'desktop' }) {
       <nav className="flex flex-col gap-1 px-3 pb-3">
         <Item to="/imoveis" icon={Building2} end>
           Imóveis
+        </Item>
+        <Item to="/simulacoes" icon={BarChart3}>
+          Simulações
         </Item>
         <Item to="/imoveis/novo" icon={Plus}>
           Novo imóvel

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { formatBRL, formatM2 } from '@/utils/formatters'
-import { Car, Ruler, BedDouble, Trash2, Eye, PawPrint, ExternalLink } from 'lucide-react'
+import { Car, Ruler, BedDouble, Trash2, Eye, PawPrint, ExternalLink, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -155,6 +155,29 @@ export default function ImovelCard({ imovel, onRemove }) {
               {formatBRL(custoFixo)}
             </div>
           </div>
+        )}
+
+        {/* CTA simulação — só aparece quando não há simulação */}
+        {!hasSimulacao && (
+          <Link
+            to={`/imoveis/${imovel?.id}#simulacao`}
+            className="flex items-center justify-center gap-2 rounded-full py-2 text-xs font-semibold transition-all"
+            style={{
+              backgroundColor: 'rgba(107,143,110,0.1)',
+              color: 'var(--color-accent-2)',
+              border: '1.5px dashed rgba(107,143,110,0.35)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.backgroundColor = 'rgba(107,143,110,0.18)'
+              e.currentTarget.style.borderColor = 'var(--color-accent-2)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.backgroundColor = 'rgba(107,143,110,0.1)'
+              e.currentTarget.style.borderColor = 'rgba(107,143,110,0.35)'
+            }}
+          >
+            <Plus style={{ width: 13, height: 13 }} /> Fazer simulação
+          </Link>
         )}
 
         {/* Spacer */}

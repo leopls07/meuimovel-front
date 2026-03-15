@@ -6,12 +6,15 @@ const TITLES = [
   { match: /^\/imoveis$/, title: 'Imóveis' },
   { match: /^\/imoveis\/novo$/, title: 'Cadastrar imóvel' },
   { match: /^\/imoveis\/.+/, title: 'Detalhe do imóvel' },
+  { match: /^\/simulacoes$/, title: 'Simulações' },
+  { match: /^\/simulacoes\/novo$/, title: 'Cadastrar simulação' },
+  { match: /^\/simulacoes\/.+/, title: 'Detalhe da simulação' },
 ]
 
 function usePageTitle() {
   const { pathname } = useLocation()
   const found = TITLES.find((t) => t.match.test(pathname))
-  return found?.title || 'meuimovel'
+  return found?.title || 'Sacada'
 }
 
 export default function Layout() {
