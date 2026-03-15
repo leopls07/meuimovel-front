@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import CozyMoneyInput from '@/components/ui/CozyMoneyInput'
+import CozyMoneyInput from '@/components/ui/cozymoneyinput'
 
 function Spinner() {
   return <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />

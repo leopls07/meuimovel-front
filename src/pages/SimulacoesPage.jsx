@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { BarChart3, SlidersHorizontal, X } from 'lucide-react'
 import SimulacaoCard from '@/components/simulacao/SimulacaoCard'
-import CozyMoneyInput from '@/components/ui/CozyMoneyInput'
+import CozyMoneyInput from '@/components/ui/cozymoneyinput'
 import { useSimulacoesGeral } from '@/hooks/useSimulacoesGeral'
 
 const inputStyle = {
