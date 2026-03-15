@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import CozyMoneyInput from '@/components/ui/cozymoneyinput'
 
 function Spinner() {
   return (
@@ -22,20 +23,29 @@ function calcularIptuMensal(precoValor, aliquotaValor) {
   return (preco * (aliquota / 100)) / 12
 }
 
+const BOOLEAN_FIELDS = ['areaLazer', 'vagaCoberta', 'varanda', 'aceitaPets']
+
 function buildInitial(mode, initialData) {
   const base = {
     localizacao: '', metragem: '', quartos: '', vagas: '', qtdBanheiros: '',
     andar: '', anoConstrucao: '', areaLazer: false, vagaCoberta: false, varanda: false,
-    preco: '', condominioMensal: '', iptuMensal: '', aliquotaIptu: '',
+    preco: null, condominioMensal: null, iptuMensal: null, aliquotaIptu: '',
     distanciaMetroKm: '', notaLocalizacao: '', estadoConservacao: '', observacoes: '',
     url: '', aceitaPets: false,
   }
   if (!initialData) return base
-  const merged = { ...base, ...initialData }
-  if (mode === 'patch') {
-    Object.keys(base).forEach((k) => { merged[k] = '' })
-    ;['areaLazer', 'vagaCoberta', 'varanda', 'aceitaPets'].forEach((k) => { merged[k] = false })
-  }
+
+  const merged = { ...base }
+  Object.keys(base).forEach((k) => {
+    if (initialData[k] == null) return
+    if (BOOLEAN_FIELDS.includes(k)) {
+      merged[k] = Boolean(initialData[k])
+    } else if (['preco', 'condominioMensal', 'iptuMensal'].includes(k)) {
+      merged[k] = Number(initialData[k])
+    } else {
+      merged[k] = String(initialData[k])
+    }
+  })
   return merged
 }
 
@@ -103,16 +113,18 @@ function SectionTitle({ children }) {
   )
 }
 
-export default function ImovelForm({ mode = 'create', initialData, onSubmit, onCancel, submitLabel = 'Salvar' }) {
+export default function ImovelForm({ mode = 'create', initialData, onSubmit, onCancel = () => {}, submitLabel = 'Salvar' }) {
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState({})
   const [form, setForm] = useState(() => buildInitial(mode, initialData))
 
   const computed = useMemo(() => {
-    const preco = numberOrNull(form.preco)
+    const preco = form.preco
     const met = numberOrNull(form.metragem)
-    const iptuMensalCalculado = calcularIptuMensal(form.preco, form.aliquotaIptu)
-    const custoFixo = (numberOrNull(form.condominioMensal) || 0) + (iptuMensalCalculado || 0)
+    const iptuMensalCalculado = (preco != null && form.aliquotaIptu !== '')
+      ? calcularIptuMensal(preco, form.aliquotaIptu)
+      : null
+    const custoFixo = (form.condominioMensal || 0) + (iptuMensalCalculado || 0)
     return { precoM2: preco != null && met ? preco / met : null, custoFixo, iptuMensalCalculado }
   }, [form])
 
@@ -121,9 +133,23 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
       const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
       setForm((f) => {
         const next = { ...f, [key]: value }
-        if (key === 'preco' || key === 'aliquotaIptu') {
+        if (key === 'aliquotaIptu') {
           const iptuMensal = calcularIptuMensal(next.preco, next.aliquotaIptu)
-          next.iptuMensal = iptuMensal != null ? iptuMensal.toFixed(2) : ''
+          next.iptuMensal = iptuMensal
+        }
+        return next
+      })
+      setErrors((prev) => ({ ...prev, [key]: undefined }))
+    }
+  }
+
+  function setMoneyField(key) {
+    return (num) => {
+      setForm((f) => {
+        const next = { ...f, [key]: num }
+        if (key === 'preco') {
+          const iptuMensal = calcularIptuMensal(num, next.aliquotaIptu)
+          next.iptuMensal = iptuMensal
         }
         return next
       })
@@ -149,11 +175,11 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
       qtdBanheiros: numberOrNull(form.qtdBanheiros),
       andar: numberOrNull(form.andar),
       anoConstrucao: numberOrNull(form.anoConstrucao),
-      areaLazer: form.areaLazer || undefined,
-      vagaCoberta: form.vagaCoberta || undefined,
-      varanda: form.varanda || undefined,
-      preco: numberOrNull(form.preco),
-      condominioMensal: numberOrNull(form.condominioMensal),
+      areaLazer: form.areaLazer,
+      vagaCoberta: form.vagaCoberta,
+      varanda: form.varanda,
+      preco: form.preco ?? null,
+      condominioMensal: form.condominioMensal ?? null,
       iptuMensal: computed.iptuMensalCalculado ?? null,
       aliquotaIptu: numberOrNull(form.aliquotaIptu),
       distanciaMetroKm: numberOrNull(form.distanciaMetroKm),
@@ -161,10 +187,13 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
       estadoConservacao: numberOrNull(form.estadoConservacao),
       observacoes: form.observacoes || undefined,
       url: form.url || undefined,
-      aceitaPets: form.aceitaPets || undefined,
+      aceitaPets: form.aceitaPets,
     }
     if (mode === 'patch') {
-      Object.keys(payload).forEach((k) => { if (payload[k] == null || payload[k] === '' || payload[k] === false) delete payload[k] })
+      Object.keys(payload).forEach((k) => {
+        if (BOOLEAN_FIELDS.includes(k)) return
+        if (payload[k] == null || payload[k] === '') delete payload[k]
+      })
     }
     try {
       await onSubmit?.(payload, applyValidationErrors)
@@ -193,7 +222,7 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
           ))}
         </div>
         <div className="flex flex-wrap gap-5 pt-1">
-          {[['areaLazer','Área de lazer'],['vagaCoberta','Vaga coberta'],['varanda','Varanda']].map(([k, label]) => (
+          {[['areaLazer','Área de lazer'],['vagaCoberta','Vaga coberta'],['varanda','Varanda'],['aceitaPets','Aceita pets']].map(([k, label]) => (
             <CheckboxField key={k} label={label} checked={form[k]} onChange={setField(k)} />
           ))}
         </div>
@@ -203,16 +232,16 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
         <SectionTitle>Financeiro</SectionTitle>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Preço" error={errors.preco}>
-            <CozyInput type="number" placeholder="0,00" value={form.preco} onChange={setField('preco')} />
+            <CozyMoneyInput value={form.preco} onChange={setMoneyField('preco')} />
           </Field>
           <Field label="Condomínio mensal" error={errors.condominioMensal}>
-            <CozyInput type="number" placeholder="0,00" value={form.condominioMensal} onChange={setField('condominioMensal')} />
+            <CozyMoneyInput value={form.condominioMensal} onChange={setMoneyField('condominioMensal')} />
           </Field>
           <Field label="Alíquota IPTU (%)" error={errors.aliquotaIptu}>
             <CozyInput type="number" placeholder="0" value={form.aliquotaIptu} onChange={setField('aliquotaIptu')} />
           </Field>
           <Field label="IPTU mensal" hint="Calculado automaticamente: (preço × alíquota) ÷ 12">
-            <CozyInput type="number" placeholder="0,00" value={form.iptuMensal} readOnly />
+            <CozyMoneyInput value={form.iptuMensal} readOnly />
           </Field>
           <Field label="Distância do metrô (km)" error={errors.distanciaMetroKm}>
             <CozyInput type="number" placeholder="0" value={form.distanciaMetroKm} onChange={setField('distanciaMetroKm')} />
@@ -252,9 +281,7 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
             <CozyInput type="url" value={form.url} onChange={setField('url')} placeholder="https://..." />
           </Field>
         </div>
-        <div className="pt-1">
-          <CheckboxField label="Aceita pets" checked={form.aceitaPets} onChange={setField('aceitaPets')} />
-        </div>
+        
       </section>
 
       <div className="flex flex-wrap gap-3 pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>

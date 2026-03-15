@@ -1,13 +1,8 @@
 import { useState } from 'react'
+import CozyMoneyInput from '@/components/ui/cozymoneyinput'
 
 function Spinner() {
   return <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
-}
-
-function num(v) {
-  if (v === '' || v == null) return null
-  const n = Number(v)
-  return Number.isFinite(n) ? n : null
 }
 
 const inputStyle = {
@@ -48,25 +43,30 @@ function CozyInput(props) {
 export default function SimulacaoForm({ initialData, onSubmit, onCancel, submitLabel = 'Salvar' }) {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
-    entrada: initialData?.entrada ?? '',
+    entrada: initialData?.entrada ?? null,
     taxaJurosAnual: initialData?.taxaJurosAnual != null ? Number(initialData.taxaJurosAnual) * 100 : '',
     prazoMeses: initialData?.prazoMeses ?? '',
-    amortizacaoExtraMes: initialData?.amortizacaoExtraMes ?? '',
+    amortizacaoExtraMes: initialData?.amortizacaoExtraMes ?? null,
   })
 
   function setField(key) {
     return (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
   }
 
+  function setMoneyField(key) {
+    return (num) => setForm((f) => ({ ...f, [key]: num }))
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
+    const n = (v) => { const x = Number(v); return Number.isFinite(x) ? x : null }
     try {
       await onSubmit?.({
-        entrada: num(form.entrada),
-        taxaJurosAnual: num(form.taxaJurosAnual) != null ? num(form.taxaJurosAnual) / 100 : null,
-        prazoMeses: num(form.prazoMeses),
-        amortizacaoExtraMes: num(form.amortizacaoExtraMes),
+        entrada: form.entrada ?? null,
+        taxaJurosAnual: n(form.taxaJurosAnual) != null ? n(form.taxaJurosAnual) / 100 : null,
+        prazoMeses: n(form.prazoMeses),
+        amortizacaoExtraMes: form.amortizacaoExtraMes ?? null,
       })
     } finally {
       setSaving(false)
@@ -77,16 +77,16 @@ export default function SimulacaoForm({ initialData, onSubmit, onCancel, submitL
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Entrada">
-          <CozyInput type="number" placeholder="0,00" value={form.entrada} onChange={setField('entrada')} />
+          <CozyMoneyInput value={form.entrada} onChange={setMoneyField('entrada')} />
         </Field>
         <Field label="Taxa de juros anual (%)">
-          <CozyInput type="number" placeholder="12" value={form.taxaJurosAnual} onChange={setField('taxaJurosAnual')} />
+          <CozyInput type="number" placeholder="6,1" value={form.taxaJurosAnual} onChange={setField('taxaJurosAnual')} />
         </Field>
         <Field label="Prazo (meses)">
           <CozyInput type="number" placeholder="360" value={form.prazoMeses} onChange={setField('prazoMeses')} />
         </Field>
         <Field label="Amortização extra/mês">
-          <CozyInput type="number" placeholder="0,00" value={form.amortizacaoExtraMes} onChange={setField('amortizacaoExtraMes')} />
+          <CozyMoneyInput value={form.amortizacaoExtraMes} onChange={setMoneyField('amortizacaoExtraMes')} placeholder="R$ 0,00" />
         </Field>
       </div>
 

@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import ListaImoveisPage from './pages/ListaImoveisPage'
 import NovoImovelPage from './pages/NovoImovelPage'
 import DetalheImovelPage from './pages/DetalheImovelPage'
+import SimulacoesPage from './pages/SimulacoesPage'
 import { Toaster } from 'sonner'
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="imoveis" element={<ListaImoveisPage />} />
           <Route path="imoveis/novo" element={<NovoImovelPage />} />
           <Route path="imoveis/:id" element={<DetalheImovelPage />} />
+          <Route path="simulacoes" element={<SimulacoesPage />} />
         </Route>
 
         {/* Qualquer rota desconhecida vai para /imoveis */}
