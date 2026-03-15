@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { Building2, Home, Plus, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import logo from '@/assets/favicon.png'
 
 function Item({ to, icon: Icon, children, end }) {
   return (
@@ -46,7 +47,7 @@ export default function SidebarNav({ variant = 'desktop' }) {
             className="flex h-12 w-12 items-center justify-center rounded-xl shrink-0"
             style={{ backgroundColor: 'var(--color-surface-2)', color: '#fff' }}
           >
-            <img src="src/assets/favicon.png" alt="Logo" className="h-10 w-10" />
+            <img src={logo} alt="Logo" className="h-10 w-10" />
           </div>
           <div className="leading-tight">
             <div
