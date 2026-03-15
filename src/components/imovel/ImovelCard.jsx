@@ -184,7 +184,7 @@ export default function ImovelCard({ imovel, onRemove }) {
         <div className="flex-1" />
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-1" style={{ borderTop: '1px solid var(--color-border)' }}>
+        <div className="flex items-center gap-2 pt-6" style={{ borderTop: '1px solid var(--color-border)' }}>
           <Link
             to={`/imoveis/${imovel?.id}`}
             className="flex flex-1 items-center justify-center gap-2 rounded-full py-2 text-sm font-semibold transition-all"
