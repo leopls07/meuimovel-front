@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 
 /**
- * Input com formatação monetária BRL em tempo real.
- * - Aceita `value` como número (ex: 650000)
- * - Chama `onChange(numericValue)` com o número puro
- * - Exibe "R$ 650.000,00" enquanto o usuário digita
+ * Formata em tempo real enquanto digita.
+ * - Recebe `value` como número (ex: 650000)
+ * - Chama `onChange(number)` com o número puro — nunca com caracteres de formatação
+ * - Exibe "R$ 650.000" enquanto digita, "R$ 650.000,50" se tiver centavos
  */
 
 const inputStyle = {
@@ -19,59 +19,96 @@ const inputStyle = {
   transition: 'border-color 150ms, box-shadow 150ms',
 }
 
-function toDisplay(num) {
-  if (num === '' || num == null) return ''
-  const n = typeof num === 'string' ? parseFloat(num) : num
+/** Converte número para string formatada BRL sem símbolo de moeda */
+function formatDisplay(num) {
+  if (num == null || num === '') return ''
+  const n = typeof num === 'string' ? parseFloat(String(num).replace(',', '.')) : num
   if (!Number.isFinite(n)) return ''
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  // Formata com separadores mas sem "R$" para exibir no input
+  return n.toLocaleString('pt-BR', {
+    minimumFractionDigits: n % 1 !== 0 ? 2 : 0,
+    maximumFractionDigits: 2,
+  })
 }
 
-function parseInput(raw) {
-  // Remove tudo exceto dígitos e vírgula
-  const digits = raw.replace(/[^\d,]/g, '')
-  // Trata vírgula como separador decimal
-  const normalized = digits.replace(',', '.')
-  const n = parseFloat(normalized)
+/**
+ * Converte o que o usuário digitou para número.
+ * Suporta "650.000,50" → 650000.50
+ *        "650000,50"  → 650000.50
+ *        "650000"     → 650000
+ */
+function parseDisplay(raw) {
+  if (!raw || raw.trim() === '') return null
+  // Remove "R$" e espaços que possam ter entrado
+  let clean = raw.replace(/R\$\s*/g, '').trim()
+  // Remove pontos de milhar (qualquer ponto seguido de 3 dígitos é separador)
+  // Troca vírgula decimal por ponto
+  clean = clean.replace(/\./g, '').replace(',', '.')
+  const n = parseFloat(clean)
   return Number.isFinite(n) ? n : null
 }
 
-export default function CozyMoneyInput({ value, onChange, placeholder = 'R$ 0,00', readOnly, style: extraStyle, ...props }) {
-  const [display, setDisplay] = useState(() => toDisplay(value))
-  const [focused, setFocused] = useState(false)
+/**
+ * Formata a string bruta enquanto o usuário digita:
+ * mantém apenas dígitos e uma vírgula, aplica separadores de milhar na parte inteira.
+ */
+function formatWhileTyping(raw) {
+  // Remove tudo exceto dígitos e vírgula
+  const clean = raw.replace(/[^\d,]/g, '')
 
-  // Sync external value changes (ex: quando buildInitial seta o valor)
+  // Separa parte inteira e decimal
+  const commaIdx = clean.indexOf(',')
+  let intPart, decPart
+
+  if (commaIdx === -1) {
+    intPart = clean
+    decPart = null
+  } else {
+    intPart = clean.slice(0, commaIdx)
+    decPart = clean.slice(commaIdx + 1, commaIdx + 3) // máx 2 casas decimais
+  }
+
+  // Aplica pontos de milhar na parte inteira
+  const intFormatted = intPart
+    ? parseInt(intPart, 10).toLocaleString('pt-BR')
+    : ''
+
+  if (decPart !== null) {
+    return `${intFormatted},${decPart}`
+  }
+  return intFormatted
+}
+
+export default function CozyMoneyInput({
+  value,
+  onChange,
+  placeholder = 'R$ 0,00',
+  readOnly,
+  style: extraStyle,
+  ...props
+}) {
+  const [display, setDisplay] = useState(() => formatDisplay(value))
+
+  // Sincroniza quando o valor externo muda (ex: reset do form)
   useEffect(() => {
-    if (!focused) {
-      setDisplay(toDisplay(value))
-    }
-  }, [value, focused])
+    setDisplay(formatDisplay(value))
+  }, [value])
 
   function handleChange(e) {
     const raw = e.target.value
-    setDisplay(raw)
-    const num = parseInput(raw)
+    const formatted = formatWhileTyping(raw)
+    setDisplay(formatted)
+
+    // Envia número puro para o pai — nunca a string formatada
+    const num = parseDisplay(formatted)
     onChange?.(num)
   }
 
-  function handleFocus(e) {
-    setFocused(true)
-    // Mostra só o número puro para facilitar a edição
-    const n = typeof value === 'string' ? parseFloat(value) : value
-    if (Number.isFinite(n) && n !== 0) {
-      setDisplay(String(n).replace('.', ','))
-    } else {
-      setDisplay('')
-    }
-    e.target.style.borderColor = 'var(--color-accent)'
-    e.target.style.boxShadow = '0 0 0 3px rgba(201,106,46,0.15)'
-  }
-
   function handleBlur(e) {
-    setFocused(false)
-    // Formata ao sair do campo
-    const num = parseInput(display)
+    // No blur, aplica formatação completa (arredonda centavos, etc.)
+    const num = parseDisplay(display)
     if (num != null) {
-      setDisplay(toDisplay(num))
+      setDisplay(formatDisplay(num))
       onChange?.(num)
     } else {
       setDisplay('')
@@ -79,6 +116,11 @@ export default function CozyMoneyInput({ value, onChange, placeholder = 'R$ 0,00
     }
     e.target.style.borderColor = 'var(--color-border)'
     e.target.style.boxShadow = 'none'
+  }
+
+  function handleFocus(e) {
+    e.target.style.borderColor = 'var(--color-accent)'
+    e.target.style.boxShadow = '0 0 0 3px rgba(201,106,46,0.15)'
   }
 
   return (

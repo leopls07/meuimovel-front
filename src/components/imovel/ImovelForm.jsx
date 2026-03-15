@@ -222,7 +222,7 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
           ))}
         </div>
         <div className="flex flex-wrap gap-5 pt-1">
-          {[['areaLazer','Área de lazer'],['vagaCoberta','Vaga coberta'],['varanda','Varanda']].map(([k, label]) => (
+          {[['areaLazer','Área de lazer'],['vagaCoberta','Vaga coberta'],['varanda','Varanda'],['aceitaPets','Aceita pets']].map(([k, label]) => (
             <CheckboxField key={k} label={label} checked={form[k]} onChange={setField(k)} />
           ))}
         </div>
@@ -281,9 +281,7 @@ export default function ImovelForm({ mode = 'create', initialData, onSubmit, onC
             <CozyInput type="url" value={form.url} onChange={setField('url')} placeholder="https://..." />
           </Field>
         </div>
-        <div className="pt-1">
-          <CheckboxField label="Aceita pets" checked={form.aceitaPets} onChange={setField('aceitaPets')} />
-        </div>
+        
       </section>
 
       <div className="flex flex-wrap gap-3 pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
