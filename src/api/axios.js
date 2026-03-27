@@ -14,11 +14,11 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// ─── Response: se a API devolver 401, limpa a sessão e redireciona ────────────
+// ─── Response: se a API devolver 401 ou 403, limpa a sessão e redireciona ─────
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
       localStorage.removeItem('meuimovel:token')
       localStorage.removeItem('meuimovel:user')
       window.location.href = '/login'
