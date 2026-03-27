@@ -81,6 +81,7 @@ function CozyInput({ readOnly, ...props }) {
       readOnly={readOnly}
       onFocus={e => { if (!readOnly) { e.target.style.borderColor = 'var(--color-accent)'; e.target.style.boxShadow = '0 0 0 3px rgba(201,106,46,0.15)' } }}
       onBlur={e => { e.target.style.borderColor = 'var(--color-border)'; e.target.style.boxShadow = 'none' }}
+      onWheel={e => e.target.blur()}
       {...props}
     />
   )

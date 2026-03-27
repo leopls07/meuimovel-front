@@ -54,6 +54,7 @@ function CozyInput({ type = 'text', placeholder, value, onChange }) {
         e.target.style.borderColor = 'var(--color-border)'
         e.target.style.boxShadow = 'none'
       }}
+      onWheel={e => e.target.blur()}
     />
   )
 }
